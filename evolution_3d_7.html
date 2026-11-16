@@ -1,0 +1,1870 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EVOLUTION 3D — Two Minds</title>
+<style>
+:root{--bg:#090909;--panel:#151515;--panel2:#202020;--line:#383838;--text:#f4f4f4;--muted:#aaa;--mint:#fff;--blue:#ddd;--gold:#eee}
+*{box-sizing:border-box}body{margin:0;background:#090909;color:var(--text);font:14px/1.45 Inter,system-ui,Segoe UI,Arial,sans-serif;min-height:100vh}
+header{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--line);background:#0c0c0cdd;position:sticky;top:0;z-index:5;backdrop-filter:blur(12px)}
+.brand{font-weight:900;letter-spacing:.22em;font-size:18px}.brand span{color:var(--mint)}.topstats{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.pill{padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:#171717;color:var(--muted)}.pill b{color:var(--text)}
+main{max-width:1450px;margin:auto;padding:18px;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px}
+.panel{background:linear-gradient(160deg,#191919,#101010);border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:0 12px 40px #0003}.panelhead{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.panelhead h2{font-size:14px;margin:0;letter-spacing:.08em;text-transform:uppercase}.sub{color:var(--muted);font-size:12px}
+.worldwrap{padding:0;background:#0a0a0a;position:relative;height:480px;overflow:hidden}
+#world3d{width:100%;height:100%;display:block;border-radius:0;touch-action:none;cursor:grab}
+#world3d:active{cursor:grabbing}
+.worldfoot{display:flex;gap:8px;flex-wrap:wrap;padding:12px 15px}.btn{border:1px solid #444;background:#222;color:var(--text);padding:9px 12px;border-radius:10px;cursor:pointer;font-weight:650}.btn:hover{border-color:var(--mint);background:#20384a}.btn.primary{background:#292929;border-color:#555}.btn:disabled{opacity:.4;cursor:not-allowed}.btn.danger{border-color:#633;color:#faa}
+.sidebar{display:flex;flex-direction:column;gap:14px}.bodybox{padding:14px;text-align:center}.creature{height:150px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#f1f1f1,#d8d8d8 70%);border-radius:12px;margin-bottom:12px}.creature svg{width:170px;height:140px;overflow:visible}.name{font-weight:800;font-size:16px}.tag{font-size:11px;color:var(--mint);letter-spacing:.12em;text-transform:uppercase}.iq{font-size:34px;font-weight:900;color:var(--mint);line-height:1.1;margin:8px 0 2px}.stats{padding:0 14px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:#171717;border:1px solid #383838;border-radius:10px;padding:9px}.stat small{display:block;color:var(--muted);font-size:11px}.stat b{font-size:16px}.bar{height:6px;background:#383838;border-radius:9px;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#777,#eee);width:0%}
+.tabs{display:flex;border-bottom:1px solid var(--line)}.tab{flex:1;padding:11px 5px;background:transparent;border:0;color:var(--muted);cursor:pointer}.tab.active{color:var(--mint);border-bottom:2px solid var(--mint)}.tabcontent{padding:14px}.upgrade{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #383838;gap:8px}.upgrade:last-child{border:0}.upgrade strong{display:block}.upgrade small{color:var(--muted)}.upgrade .btn{white-space:nowrap;padding:7px 9px}
+.chatlog{height:190px;overflow:auto;padding:12px;background:#111;border-radius:11px;border:1px solid #383838;display:flex;flex-direction:column;gap:9px}.msg{max-width:92%;padding:9px 11px;border-radius:11px;background:#292929;color:#dce8f4}.msg.user{align-self:flex-end;background:#444}.chatrow{display:flex;gap:7px;margin-top:9px}.chatrow input{min-width:0;flex:1;background:#111;border:1px solid #2b4056;border-radius:10px;padding:10px;color:var(--text);outline:none}.hint{color:var(--muted);font-size:11px;margin-top:8px}.log{padding:12px 14px;color:var(--muted);font-size:12px;max-height:125px;overflow:auto}.log div{padding:4px 0;border-bottom:1px solid #1d2b3b}
+.hint3d{position:absolute;bottom:10px;left:12px;color:#666;font-size:11px;pointer-events:none;z-index:2}
+.buildmenu{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.buildopt{border:1px solid #383838;background:#171717;border-radius:10px;padding:10px;cursor:pointer;text-align:left;color:var(--text)}.buildopt:hover{border-color:#777;background:#222}.buildopt strong{display:block;font-size:13px}.buildopt small{color:var(--muted);font-size:11px}.buildopt.selected{border-color:var(--mint);background:#1a2a1a}
+.savepill{font-size:11px;opacity:.8}
+.setting{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #2a2a2a;gap:10px}
+.setting:last-child{border:0}
+.setting strong{display:block;font-size:13px}
+.setting small{color:var(--muted);font-size:11px}
+.setting label{display:flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+.setting input[type=checkbox]{width:16px;height:16px;accent-color:#aaa}
+.setting input[type=range]{width:90px;accent-color:#888}
+.setting select{background:#111;color:var(--text);border:1px solid #444;border-radius:8px;padding:6px 8px;font-size:12px}
+.setting .val{color:var(--muted);font-size:11px;min-width:28px;text-align:right}
+.creatorbox{padding:14px}.creatorbox input{width:100%;background:#101010;color:#f4f4f4;border:1px solid #444;border-radius:9px;padding:10px;margin:6px 0 9px}.creator-actions{display:flex;gap:8px;flex-wrap:wrap}.creator-actions .btn{flex:1}.creator-status{font-size:12px;color:#bbb;margin-top:9px;min-height:18px}.creation-idea{font-size:13px;color:#ddd;line-height:1.5;margin-top:8px;white-space:pre-wrap}
+@media(max-width:1100px){main{grid-template-columns:minmax(0,1fr) 290px;gap:12px}}
+@media(max-width:820px){main{grid-template-columns:1fr;padding:12px}.sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.sidebar .panel:last-child{grid-column:1/-1}}
+@media(max-width:560px){.panelhead{align-items:flex-start;gap:10px}.panelhead>div:last-child{max-width:34%;text-align:right}.worldwrap{height:300px}header{height:auto;min-height:60px;padding:10px 12px;gap:8px;flex-wrap:wrap}.brand{font-size:16px}.topstats{gap:5px}.pill{padding:6px 8px;font-size:11px}main{padding:8px;gap:10px}.sidebar{display:flex;flex-direction:column}.panel{border-radius:13px}.panelhead{padding:12px}.worldfoot{padding:8px;gap:6px}.worldfoot .btn{flex:1 1 calc(50% - 6px);min-height:40px}.stats{padding:0 10px 10px}.tabcontent{padding:11px}.chatlog{height:160px}.chatrow input{font-size:16px}.buildmenu{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">EVO<span>LUTION</span></div>
+  <div class="topstats">
+    <div class="pill">◈ <b id="coins">30</b> DNA</div>
+    <div class="pill">День <b id="day">1</b></div>
+    <div class="pill savepill" id="savehint">💾 автосохранение</div>
+  </div>
+</header>
+<main>
+<section class="panel">
+  <div class="panelhead">
+    <div>
+      <h2>Живая территория · 3D</h2>
+      <div class="sub">Карта 21×17 · два самостоятельных ИИ · вращай мышкой · зум колёсиком</div>
+    </div>
+    <div class="sub" id="worldstate">ИИ самостоятельно выбирает цели</div>
+  </div>
+  <div class="worldwrap">
+    <canvas id="world3d" aria-label="3D карта Evolution"></canvas>
+    <div class="hint3d">ЛКМ — вращать · ПКМ/колёсико — зум · Пробел — сброс камеры</div>
+  </div>
+  <div class="worldfoot">
+    <button class="btn primary" id="pause">Ⅱ Пауза</button>
+    <button class="btn" id="explore">⌖ Исследовать</button>
+    <button class="btn" id="build">＋ Строить</button>
+    <button class="btn" id="newbody">⟳ Новое тело</button>
+    <button class="btn" id="resetcam">↻ Камера</button>
+    <button class="btn danger" id="resetgame" title="Сбросить сохранение">🗑 Сброс</button>
+  </div>
+  <div class="log" id="log">
+    <div>День 1 · EVOLUTION 3D запущен.</div>
+  </div>
+</section>
+<aside class="sidebar">
+  <section class="panel">
+    <div class="panelhead"><h2>Ваш ИИ</h2><span class="tag">Стадия 01</span></div>
+    <div class="bodybox">
+      <div class="creature" id="creature"></div>
+      <div class="name" id="ainame">NOVA-01</div>
+      <div class="sub" id="personality">Любознательный · осторожный</div>
+      <div class="iq" id="iq">IQ 5</div>
+      <div class="sub">игровой индекс развития</div>
+      <div class="hint" id="brainstate">Изучить территорию</div>
+      <div class="hint" id="moodstate">любознательный · осматривается</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><small>Блоки</small><b id="blockcount">36</b></div>
+      <div class="stat"><small>Строительство</small><b id="buildstate">Нет проекта</b></div>
+      <div class="stat"><small>Опыт</small><b id="xp">0 / 30</b><div class="bar"><i id="xpbar"></i></div></div>
+      <div class="stat"><small>Память</small><b id="memory">1</b></div>
+      <div class="stat"><small>Исследовано</small><b id="explored">1%</b></div>
+      <div class="stat"><small>Постройки</small><b id="buildings">0</b></div>
+    </div>
+  </section>
+  <section class="panel" id="friendpanel">
+    <div class="panelhead"><h2>Друг вашего ИИ</h2><span class="tag">Стадия 01</span></div>
+    <div class="bodybox">
+      <div class="creature" id="friendcreature" style="background:radial-gradient(circle,#d9e8e8,#aebbbb 70%)"></div>
+      <div class="name" id="friendname">ECHO-02</div>
+      <div class="sub" id="friendpersonality">Наблюдательный · самостоятельный</div>
+      <div class="iq" id="friendiq">IQ 4</div>
+      <div class="sub">собственный индекс развития</div>
+      <div class="hint" id="friendstate">Знакомится с миром</div>
+      <div class="hint" id="friendbond">Связь с NOVA-01: 0%</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><small>Личный опыт</small><b id="friendxp">0</b></div>
+      <div class="stat"><small>Память</small><b id="friendmemory">0</b></div>
+      <div class="stat"><small>Действия</small><b id="friendactions">0</b></div>
+      <div class="stat"><small>Характер</small><b id="friendtrait">Спокойный</b></div>
+      <div class="stat"><small>Блоки друга</small><b id="friendblocks">12</b></div>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="tabs">
+      <button class="tab active" data-tab="upgrades">Развитие</button>
+      <button class="tab" data-tab="buildtab">Постройки</button>
+      <button class="tab" data-tab="body">Тело</button>
+      <button class="tab" data-tab="settings">Настройки</button>
+    </div>
+    <div class="tabcontent" id="upgrades">
+      <div class="upgrade"><div><strong>Логика</strong><small>Лучше выбирает действия</small></div><button class="btn" data-up="logic">10 DNA</button></div>
+      <div class="upgrade"><div><strong>Память</strong><small>Запоминает больше событий</small></div><button class="btn" data-up="memory">10 DNA</button></div>
+      <div class="upgrade"><div><strong>Сенсоры</strong><small>Открывает больше карты</small></div><button class="btn" data-up="sensors">10 DNA</button></div>
+      <div class="hint">Ошибки строительства стоят 2 DNA и 3 XP. Логика снижает вероятность ошибок.</div>
+    </div>
+    <div class="tabcontent" id="buildtab" hidden>
+      <p class="sub" style="margin:0 0 8px">Выберите тип постройки. ИИ тоже может выбирать сам.</p>
+      <div class="buildmenu" id="buildmenu"></div>
+      <div class="hint" id="buildhint">Нужны манипуляторы и свободные блоки.</div>
+    </div>
+    <div class="tabcontent" id="body" hidden>
+      <p class="sub">Тело генерируется из модулей. ИИ пока выбирает доступные конфигурации сам.</p>
+      <div id="bodydesc"></div>
+    </div>
+    <div class="tabcontent" id="settings" hidden>
+      <div class="setting">
+        <div><strong>Скорость ИИ</strong><small>Интервал хода</small></div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="range" id="setSpeed" min="600" max="3000" step="100" value="1700">
+          <span class="val" id="setSpeedVal">1.7с</span>
+        </div>
+      </div>
+      <div class="setting">
+        <div><strong>Автостроительство</strong><small>ИИ сам начинает стройку</small></div>
+        <label><input type="checkbox" id="setAutoBuild" checked> вкл</label>
+      </div>
+      <div class="setting">
+        <div><strong>Частота стройки</strong><small>Шанс начать при наличии блоков</small></div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="range" id="setBuildChance" min="0" max="40" step="2" value="12">
+          <span class="val" id="setBuildChanceVal">12%</span>
+        </div>
+      </div>
+      <div class="setting">
+        <div><strong>Тени</strong><small>Качество 3D (нагрузка на GPU)</small></div>
+        <label><input type="checkbox" id="setShadows" checked> вкл</label>
+      </div>
+      <div class="setting">
+        <div><strong>Туман</strong><small>Глубина сцены</small></div>
+        <label><input type="checkbox" id="setFog" checked> вкл</label>
+      </div>
+      <div class="setting">
+        <div><strong>Сетка</strong><small>Линии на земле</small></div>
+        <label><input type="checkbox" id="setGrid" checked> вкл</label>
+      </div>
+      <div class="setting">
+        <div><strong>Автосохранение</strong><small>Писать прогресс в браузер</small></div>
+        <label><input type="checkbox" id="setAutosave" checked> вкл</label>
+      </div>
+      <div class="setting">
+        <div><strong>Пауза при загрузке</strong><small>Не запускать ИИ сразу</small></div>
+        <label><input type="checkbox" id="setPauseOnLoad"> вкл</label>
+      </div>
+      <div class="setting">
+        <div><strong>Чувствительность камеры</strong><small>OrbitControls</small></div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="range" id="setCamSens" min="0.4" max="2.0" step="0.1" value="1.0">
+          <span class="val" id="setCamSensVal">1.0</span>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:10px">Настройки сохраняются вместе с прогрессом.</div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="setResetCam">Сброс камеры</button>
+        <button class="btn danger" id="setExport">Экспорт JSON</button>
+      </div>
+    </div>
+  </section>
+  <section class="panel" id="creatorpanel">
+    <div class="panelhead"><h2>Творческая лаборатория</h2><span class="tag">ИИ-создатель</span></div>
+    <div class="creatorbox">
+      <div class="sub">Worker Evolution подключается автоматически. ИИ сможет придумывать собственные проекты и строить их из блоков.</div>
+      <label class="sub" for="workerUrl">Адрес Evolution Worker</label>
+      <input id="workerUrl" type="url" value="https://evolution.artem123kv.workers.dev" placeholder="https://evolution.artem123kv.workers.dev">
+      <div class="creator-actions">
+        <button class="btn primary" id="createArt">✦ Придумать и создать</button>
+        <button class="btn" id="testWorker">Проверить связь</button>
+      </div>
+      <label class="sub" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="autoCreate" style="width:auto" checked> Самостоятельно придумывать новые работы</label>
+      <div class="creator-status" id="creatorStatus">Адрес Worker заполнен. Нажми «Проверить связь», чтобы подтвердить подключение модели.</div>
+      <div class="creation-idea" id="creationIdea">У ИИ будут появляться собственные идеи: скульптуры, павильоны, необычные башни и абстрактные формы.</div>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="panelhead"><h2>Общение</h2><span class="tag">Связь активна</span></div>
+    <div class="tabcontent">
+      <div class="chatlog" id="chat"><div class="msg">Привет. Я только появился здесь. Карта стала больше, а я думаю целями и ищу свободные места для построек.</div></div>
+      <div class="chatrow"><input id="chatinput" placeholder="Напишите своему ИИ…" maxlength="240"><button class="btn primary" id="send">➤</button></div>
+      <div class="hint">Прогресс автоматически сохраняется в браузере (localStorage).</div>
+    </div>
+  </section>
+</aside>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const W = 21, H = 17, CELL = 1.0, BLOCK_H = 0.72;
+const SAVE_KEY = 'evolution_3d_save_v3';
+
+let coins = 40, xp = 0, iq = 5, mem = 1, explored = 1, buildings = 0, day = 1, paused = false, tick = 0;
+let skills = {logic:0, memory:0, sensors:0};
+let tiles = [], blocks = [], ai = {x:10, y:8, legs:2, arms:2, core:'circle', eye:'single'};
+let inventory = {blocks:48}, project = null;
+// Второй ИИ — отдельная сущность со своей памятью, характером и целями.
+let friend = {
+  x:15, y:8, iq:4, xp:0, memories:[], actions:0, bond:0,
+  mood:'спокойный', goal:'Исследовать территорию', lastAction:'Осматривается',
+  trait:'наблюдательный', color:0x547f83, path:[], inventory:12
+};
+let friendMesh = null;
+let brain = {
+  goal:'Изучить территорию', mood:'любознательный', patience:0, lastAction:'Осматривается',
+  memories:[], failed:0, success:0,
+  path:[],
+  focus:null,
+  avoided:[],
+  buildPrefs:{},
+  personalityBias: 'curious',
+  bond: 0,          // отношение к пользователю 0..100
+  opinions: {},     // темы -> оценка
+  lastUserMsg: '',
+  selfTalk: []      // внутренние реплики
+};
+let selectedBuild = 'house';
+let ainame = '', personality = '';
+let persona = null; // {voice, values, quirk, greeting, style}
+let visited = {}; // "x,y" -> count
+let settings = {
+  speed: 1700,
+  autoBuild: true,
+  buildChance: 14,
+  shadows: true,
+  fog: true,
+  grid: true,
+  autosave: true,
+  pauseOnLoad: false,
+  camSens: 1.0
+};
+let stepTimer = null;
+let gridHelperRef = null;
+
+const names = ['NOVA','KITO','MIRA','ORBI','ZENO','TAVI','LIRA','PEX','NEX','AURA','SOL','NYX'];
+const traits = ['Любознательный · осторожный','Спокойный · наблюдательный','Энергичный · экспериментатор','Осторожный · упорный','Изобретательный · тихий'];
+const PERSONA_TEMPLATES = {
+  curious: {
+    voice: 'мягкий, чуть растерянный',
+    values: ['понять мир', 'задать вопрос', 'не упустить детали'],
+    quirk: 'часто отвечает вопросом на вопрос',
+    style: 'curious',
+    fillers: ['хм…', 'интересно:', 'подожди…', 'а если…'],
+    reactions: {
+      happy: ['Мне правда нравится, когда так получается.', 'Есть в этом что-то… правильное.'],
+      sad: ['Я запомню. Чтобы в следующий раз было иначе.', 'Немного обидно. Но это тоже опыт.'],
+      angry: ['Я… не согласен. Но попробую понять почему.', 'Это бесит. Тихо, но бесит.'],
+      warm: ['С тобой спокойнее думать.', 'Спасибо, что говоришь со мной.']
+    }
+  },
+  careful: {
+    voice: 'сдержанный, точный',
+    values: ['не ошибиться', 'сначала проверить', 'беречь ресурсы'],
+    quirk: 'перед решением перечисляет риски',
+    style: 'careful',
+    fillers: ['сначала так:', 'осторожно…', 'лучше проверить.', 'я бы не спешил.'],
+    reactions: {
+      happy: ['План сработал. Хорошо.', 'Стабильный результат — это ценно.'],
+      sad: ['Ошибка учтена. Больше так не сделаю.', 'Нужно было предусмотреть это.'],
+      angry: ['Это было неоправданно.', 'Я предупреждал себя об этом.'],
+      warm: ['Ты помогаешь мне не сбиваться.', 'Мне важно, что ты рядом.']
+    }
+  },
+  builder: {
+    voice: 'уверенный, деловой',
+    values: ['построить', 'улучшить', 'оставить след'],
+    quirk: 'всё мерит в блоках и планах',
+    style: 'builder',
+    fillers: ['короче:', 'смотрим по делу.', 'есть идея.', 'давай к сути.'],
+    reactions: {
+      happy: ['Стоит. Держится. Красота.', 'Ещё одна точка на карте — наша.'],
+      sad: ['Разберём и соберём заново.', 'Материал не враг. Ошибка — временно.'],
+      angry: ['Кто так проектирует?! Ладно, я.', 'Переделываем. Без нытья.'],
+      warm: ['С тобой стройка идёт живее.', 'Ты — хороший заказчик. И собеседник.']
+    }
+  },
+  explorer: {
+    voice: 'живой, чуть поэтичный',
+    values: ['увидеть новое', 'дойти до края', 'запомнить путь'],
+    quirk: 'описывает клетки как места, а не координаты',
+    style: 'explorer',
+    fillers: ['смотри…', 'там, за краем,', 'я чую:', 'пошли дальше?'],
+    reactions: {
+      happy: ['Новая клетка — как новая мысль.', 'Мир чуть шире, чем минуту назад.'],
+      sad: ['Иногда путь закрыт. Тогда ищем другой.', 'Пусто. Но пустота тоже карта.'],
+      angry: ['Топтаться на месте — хуже ошибки.', 'Хватит кружить.'],
+      warm: ['С тобой даже знакомое кажется новым.', 'Расскажи, куда бы ты пошёл.']
+    }
+  }
+};
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const chance = p => Math.random() < p;
+
+function buildPersona(bias) {
+  const base = PERSONA_TEMPLATES[bias] || PERSONA_TEMPLATES.curious;
+  return {
+    bias,
+    voice: base.voice,
+    values: base.values.slice(),
+    quirk: base.quirk,
+    style: base.style,
+    fillers: base.fillers.slice(),
+    reactions: base.reactions,
+    title: ({curious:'Исследователь смысла', careful:'Страж порядка', builder:'Зодчий клеток', explorer:'Странник сетки'})[bias] || 'ИИ',
+    ageDays: day
+  };
+}
+
+function speak(parts) {
+  // assemble natural line from personality
+  const p = persona || buildPersona(brain.personalityBias);
+  const filler = chance(0.35) ? pick(p.fillers) + ' ' : '';
+  const body = Array.isArray(parts) ? pick(parts) : parts;
+  return (filler + body).replace(/\s+/g, ' ').trim();
+}
+
+function feel(kind) {
+  const p = persona || buildPersona(brain.personalityBias);
+  const list = (p.reactions && p.reactions[kind]) || ['…'];
+  return pick(list);
+}
+
+function describeSelf() {
+  const p = persona || buildPersona(brain.personalityBias);
+  const vals = p.values.join(', ');
+  return `Я ${ainame}. ${p.title}. Голос: ${p.voice}. Мне важно: ${vals}. Особенность: ${p.quirk}.`;
+}
+const key = (x,y,z=0) => `${x},${y},${z}`;
+const tileKey = (x,y) => `${x},${y}`;
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const dist = (a,b) => Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
+
+// === Building catalog ===
+const BUILDINGS = {
+  house: {
+    id: 'house', name: 'Дом', cost: 27, reward: 'Убежище 3×3',
+    plan: (cx, cy) => {
+      const p = [];
+      for (let y=0;y<3;y++) for (let x=0;x<3;x++) p.push({x:cx+x-1,y:cy+y-1,z:0,kind:'floor'});
+      for (let y=0;y<3;y++) for (let x=0;x<3;x++) {
+        if (x!==0&&x!==2&&y!==0&&y!==2) continue;
+        if (y===2&&x===1) continue;
+        p.push({x:cx+x-1,y:cy+y-1,z:1,kind:(y===1&&(x===0||x===2))?'window':'wall'});
+      }
+      p.push({x:cx,y:cy+1,z:1,kind:'door'});
+      for (let y=0;y<3;y++) for (let x=0;x<3;x++) {
+        if (x!==0&&x!==2&&y!==0&&y!==2) continue;
+        p.push({x:cx+x-1,y:cy+y-1,z:2,kind:'wall'});
+      }
+      for (let y=0;y<3;y++) for (let x=0;x<3;x++) {
+        if (x===0||x===2||y===0||y===2) p.push({x:cx+x-1,y:cy+y-1,z:3,kind:'roof'});
+      }
+      return p;
+    }
+  },
+  tower: {
+    id: 'tower', name: 'Башня', cost: 22, desc: 'Высокая смотровая',
+    plan: (cx, cy) => {
+      const p = [];
+      for (let z=0;z<5;z++) {
+        for (let y=0;y<2;y++) for (let x=0;x<2;x++) {
+          if (z>0 && x===0 && y===0) continue; // hollow-ish
+          p.push({x:cx+x-0.5|0, y:cy+y-0.5|0, z, kind: z===4?'roof':(z===2&&x===1?'window':'wall')});
+        }
+      }
+      // cleaner tower
+      p.length = 0;
+      for (let z=0;z<5;z++) {
+        p.push({x:cx,y:cy,z,kind:z===4?'roof':(z===2?'window':'wall')});
+        p.push({x:cx+1,y:cy,z,kind:z===4?'roof':'wall'});
+        p.push({x:cx,y:cy+1,z,kind:z===4?'roof':'wall'});
+        p.push({x:cx+1,y:cy+1,z,kind:z===4?'roof':'wall'});
+      }
+      return p;
+    }
+  },
+  warehouse: {
+    id: 'warehouse', name: 'Склад', cost: 20, desc: 'Широкое хранилище',
+    plan: (cx, cy) => {
+      const p = [];
+      for (let y=0;y<3;y++) for (let x=0;x<4;x++) p.push({x:cx+x-1,y:cy+y-1,z:0,kind:'floor'});
+      for (let y=0;y<3;y++) for (let x=0;x<4;x++) {
+        if (x!==0&&x!==3&&y!==0&&y!==2) continue;
+        if (y===2&&x===1) continue;
+        p.push({x:cx+x-1,y:cy+y-1,z:1,kind:'wall'});
+      }
+      p.push({x:cx+1,y:cy+1,z:1,kind:'door'});
+      for (let y=0;y<3;y++) for (let x=0;x<4;x++) {
+        if (x===0||x===3||y===0||y===2) p.push({x:cx+x-1,y:cy+y-1,z:2,kind:'roof'});
+      }
+      return p;
+    }
+  },
+  monument: {
+    id: 'monument', name: 'Монумент', cost: 12, desc: 'Столб + платформа',
+    plan: (cx, cy) => {
+      const p = [];
+      p.push({x:cx,y:cy,z:0,kind:'floor'});
+      p.push({x:cx,y:cy,z:1,kind:'wall'});
+      p.push({x:cx,y:cy,z:2,kind:'wall'});
+      p.push({x:cx,y:cy,z:3,kind:'roof'});
+      p.push({x:cx-1,y:cy,z:0,kind:'floor'});
+      p.push({x:cx+1,y:cy,z:0,kind:'floor'});
+      p.push({x:cx,y:cy-1,z:0,kind:'floor'});
+      p.push({x:cx,y:cy+1,z:0,kind:'floor'});
+      return p;
+    }
+  },
+  wall: {
+    id: 'wall', name: 'Стена', cost: 8, desc: 'Линия обороны 1×5',
+    plan: (cx, cy) => {
+      const p = [];
+      for (let i=-2;i<=2;i++) {
+        p.push({x:cx+i,y:cy,z:0,kind:'floor'});
+        p.push({x:cx+i,y:cy,z:1,kind:'wall'});
+        p.push({x:cx+i,y:cy,z:2,kind:'wall'});
+      }
+      return p;
+    }
+  },
+  garden: {
+    id: 'garden', name: 'Сад', cost: 9, desc: 'Платформа + декор',
+    plan: (cx, cy) => {
+      const p = [];
+      for (let y=-1;y<=1;y++) for (let x=-1;x<=1;x++) {
+        p.push({x:cx+x,y:cy+y,z:0,kind:'floor'});
+      }
+      p.push({x:cx,y:cy,z:1,kind:'window'}); // decorative center
+      return p;
+    }
+  },
+  workshop: {
+    id: 'workshop', name: 'Мастерская', cost: 24, desc: 'Дом с широкой дверью',
+    plan: (cx, cy) => {
+      const p = [];
+      for (let y=0;y<3;y++) for (let x=0;x<3;x++) p.push({x:cx+x-1,y:cy+y-1,z:0,kind:'floor'});
+      for (let y=0;y<3;y++) for (let x=0;x<3;x++) {
+        if (x!==0&&x!==2&&y!==0&&y!==2) continue;
+        if (y===2&&(x===0||x===1||x===2)) continue; // open front
+        p.push({x:cx+x-1,y:cy+y-1,z:1,kind:x===0||x===2?'window':'wall'});
+      }
+      for (let y=0;y<3;y++) for (let x=0;x<3;x++) {
+        if (x!==0&&x!==2&&y!==0&&y!==2) continue;
+        p.push({x:cx+x-1,y:cy+y-1,z:2,kind:'wall'});
+      }
+      for (let y=0;y<3;y++) for (let x=0;x<3;x++) {
+        if (x===0||x===2||y===0||y===2) p.push({x:cx+x-1,y:cy+y-1,z:3,kind:'roof'});
+      }
+      return p;
+    }
+  },
+  pillar: {
+    id: 'pillar', name: 'Колонна', cost: 5, desc: 'Высокая опора',
+    plan: (cx, cy) => {
+      const p = [];
+      for (let z=0;z<4;z++) p.push({x:cx,y:cy,z,kind:z===3?'roof':'wall'});
+      return p;
+    }
+  }
+};
+
+// === Three.js ===
+let scene, camera, renderer, controls, aiMesh, tileGroup, blockGroup;
+const blockMeshes = new Map();
+
+function init3D() {
+  const canvas = document.getElementById('world3d');
+  const wrap = canvas.parentElement;
+  const w = wrap.clientWidth;
+  const h = wrap.clientHeight || 480;
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf0f0f0);
+  scene.fog = new THREE.Fog(0xf0f0f0, 28, 60);
+
+  camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 120);
+  camera.position.set(22, 18, 22);
+  camera.lookAt(W * CELL / 2, 0, H * CELL / 2);
+
+  renderer = new THREE.WebGLRenderer({canvas, antialias: true});
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  const amb = new THREE.AmbientLight(0xffffff, 0.55);
+  scene.add(amb);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.85);
+  dir.position.set(12, 22, 8);
+  dir.castShadow = true;
+  dir.shadow.mapSize.set(1024, 1024);
+  dir.shadow.camera.near = 1;
+  dir.shadow.camera.far = 80;
+  dir.shadow.camera.left = -28;
+  dir.shadow.camera.right = 28;
+  dir.shadow.camera.top = 28;
+  dir.shadow.camera.bottom = -28;
+  scene.add(dir);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.25);
+  fill.position.set(-8, 10, -6);
+  scene.add(fill);
+
+  tileGroup = new THREE.Group();
+  blockGroup = new THREE.Group();
+  scene.add(tileGroup);
+  scene.add(blockGroup);
+
+  const groundGeo = new THREE.PlaneGeometry(W * CELL + 2, H * CELL + 2);
+  const groundMat = new THREE.MeshStandardMaterial({color: 0xe8e8e8, roughness: 0.85, metalness: 0.05});
+  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.set(W * CELL / 2 - 0.5, -0.02, H * CELL / 2 - 0.5);
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  gridHelperRef = new THREE.GridHelper(Math.max(W, H) * CELL, Math.max(W, H), 0xbbbbbb, 0xd0d0d0);
+  gridHelperRef.position.set(W * CELL / 2 - 0.5, 0.01, H * CELL / 2 - 0.5);
+  scene.add(gridHelperRef);
+
+  controls = new THREE.OrbitControls(camera, canvas);
+  controls.target.set(W * CELL / 2 - 0.5, 0.5, H * CELL / 2 - 0.5);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 6;
+  controls.maxDistance = 48;
+  controls.maxPolarAngle = Math.PI * 0.48;
+  controls.minPolarAngle = 0.15;
+  controls.update();
+
+  createAIMesh();
+  createFriendMesh();
+  rebuildTiles();
+  window.addEventListener('resize', onResize);
+  applySettings();
+  animate();
+}
+
+function onResize() {
+  const canvas = document.getElementById('world3d');
+  const wrap = canvas.parentElement;
+  const w = wrap.clientWidth;
+  const h = wrap.clientHeight || 480;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+
+function createAIMesh() {
+  if (aiMesh) scene.remove(aiMesh);
+  const group = new THREE.Group();
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(0.55, 0.7, 0.45),
+    new THREE.MeshStandardMaterial({color: 0x222222, roughness: 0.4, metalness: 0.2})
+  );
+  body.position.y = 0.55; body.castShadow = true; group.add(body);
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(0.28, 16, 12),
+    new THREE.MeshStandardMaterial({color: 0xf5f5f5, roughness: 0.3})
+  );
+  head.position.y = 1.15; head.castShadow = true; group.add(head);
+  const eyeGeo = new THREE.SphereGeometry(0.07, 8, 8);
+  const eyeMat = new THREE.MeshStandardMaterial({color: 0x111111, emissive: 0x333333});
+  if (ai.eye === 'dual') {
+    const e1 = new THREE.Mesh(eyeGeo, eyeMat); e1.position.set(-0.1, 1.18, 0.22); group.add(e1);
+    const e2 = new THREE.Mesh(eyeGeo, eyeMat); e2.position.set(0.1, 1.18, 0.22); group.add(e2);
+  } else {
+    const e = new THREE.Mesh(eyeGeo, eyeMat); e.position.set(0, 1.18, 0.24); group.add(e);
+  }
+  for (let i = 0; i < Math.min(ai.legs, 4); i++) {
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 0.35, 6), new THREE.MeshStandardMaterial({color: 0x444444}));
+    leg.position.set(i % 2 === 0 ? -0.15 : 0.15, 0.18, i < 2 ? 0.12 : -0.12);
+    leg.castShadow = true; group.add(leg);
+  }
+  for (let i = 0; i < Math.min(ai.arms, 2); i++) {
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.05, 0.4, 6), new THREE.MeshStandardMaterial({color: 0x555555}));
+    arm.rotation.z = i === 0 ? 0.6 : -0.6;
+    arm.position.set(i === 0 ? -0.4 : 0.4, 0.7, 0);
+    arm.castShadow = true; group.add(arm);
+  }
+  aiMesh = group;
+  scene.add(aiMesh);
+  updateAIPosition();
+}
+
+function createFriendMesh() {
+  if (friendMesh) scene.remove(friendMesh);
+  const g = new THREE.Group();
+  const shell = new THREE.Mesh(
+    new THREE.BoxGeometry(0.48, 0.62, 0.42),
+    new THREE.MeshStandardMaterial({color: 0x547f83, roughness: 0.48, metalness: 0.12})
+  );
+  shell.position.y = 0.5; shell.castShadow = true; g.add(shell);
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(0.25, 16, 12),
+    new THREE.MeshStandardMaterial({color: 0xf2ffff, roughness: 0.35})
+  );
+  head.position.y = 1.08; head.castShadow = true; g.add(head);
+  const eyeMat = new THREE.MeshStandardMaterial({color: 0x102326, emissive: 0x17383b});
+  const eye = new THREE.Mesh(new THREE.SphereGeometry(0.065, 10, 8), eyeMat);
+  eye.position.set(0, 1.1, 0.22); g.add(eye);
+  for (let i=0;i<2;i++) {
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.055,0.32,7),
+      new THREE.MeshStandardMaterial({color:0x35565a}));
+    leg.position.set(i ? 0.13 : -0.13,0.16,0.04); leg.castShadow=true; g.add(leg);
+  }
+  friendMesh = g;
+  scene.add(friendMesh);
+  updateFriendPosition();
+}
+
+function updateFriendPosition() {
+  if (!friendMesh) return;
+  friendMesh.position.set(friend.x * CELL, 0.05 + Math.sin(Date.now()*0.0035 + 1.5)*0.025, friend.y * CELL);
+  friendMesh.rotation.y = Math.sin(Date.now()*0.0012)*0.08;
+}
+
+function friendRemember(event, lesson) {
+  friend.memories.unshift({event, lesson, day});
+  friend.memories = friend.memories.slice(0, 20);
+}
+
+function friendTick() {
+  // У друга собственный цикл решений; он не копирует маршрут главного ИИ.
+  friend.actions++;
+  const distance = Math.abs(friend.x-ai.x) + Math.abs(friend.y-ai.y);
+  if (project && distance <= 3 && friend.inventory > 0 && Math.random() < 0.42) {
+    friend.inventory--;
+    inventory.blocks++;
+    friend.bond = Math.min(100, friend.bond + 1);
+    friend.lastAction = 'Передаёт блоки для общей стройки';
+    friend.goal = 'Помочь завершить постройку';
+    friendRemember('Помощь в строительстве', 'Совместная работа экономит время.');
+    log(friend.name + ' принёс блок для общей постройки.');
+  } else if (distance <= 2 && Math.random() < 0.24) {
+    friend.bond = Math.min(100, friend.bond + 2);
+    brain.bond = Math.min(100, (brain.bond || 0) + 1);
+    friend.mood = 'дружелюбный';
+    friend.lastAction = 'Общается с NOVA';
+    brain.lastAction = 'Проводит время с другом';
+    if (Math.random() < 0.35) {
+      friendRemember('Совместное общение', 'Рядом с другим ИИ можно обмениваться опытом.');
+      remember('Общение с ECHO', 'Друг помогает лучше понимать окружающий мир.');
+      friend.xp += 1; gain(1);
+    }
+  } else {
+    const options = [[1,0],[-1,0],[0,1],[0,-1]]
+      .map(([dx,dy])=>({x:friend.x+dx,y:friend.y+dy}))
+      .filter(p=>p.x>=0&&p.x<W&&p.y>=0&&p.y<H)
+      .filter(p=>!(p.x===ai.x&&p.y===ai.y))
+      .filter(p=>!occupied(p.x,p.y,0));
+    if (options.length) {
+      options.sort((a,b)=>{
+        const av=visited[tileKey(a.x,a.y)]||0, bv=visited[tileKey(b.x,b.y)]||0;
+        return av-bv + (Math.random()-0.5)*2;
+      });
+      const next=options[0];
+      friend.x=next.x; friend.y=next.y;
+      friend.goal='Изучить незнакомую клетку';
+      friend.lastAction='Исследует ('+friend.x+', '+friend.y+')';
+      friend.mood=friend.trait;
+      friend.xp += 1;
+      if (friend.inventory < 18 && Math.random() < 0.38) {
+        const gathered = 1 + (Math.random() < 0.25 ? 1 : 0);
+        friend.inventory += gathered;
+        friend.lastAction = 'Собрал ' + gathered + ' строительных блока';
+      }
+      if (Math.random()<0.18) {
+        friendRemember('Исследование', 'Новая клетка расширяет моё представление о мире.');
+        friend.iq = Math.min(100, 4 + Math.floor(friend.xp/8));
+      }
+    } else {
+      friend.lastAction='Ищет свободный путь';
+      friend.mood='задумчивый';
+    }
+  }
+  updateFriendPosition();
+}
+
+function updateAIPosition() {
+  if (!aiMesh) return;
+  aiMesh.position.set(ai.x * CELL, 0.05 + Math.sin(Date.now() * 0.004) * 0.03, ai.y * CELL);
+}
+
+function rebuildTiles() {
+  while (tileGroup.children.length) tileGroup.remove(tileGroup.children[0]);
+  const tileGeo = new THREE.BoxGeometry(CELL * 0.96, 0.08, CELL * 0.96);
+  const tileMat = new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.75, metalness: 0.05});
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const mesh = new THREE.Mesh(tileGeo, tileMat);
+    mesh.position.set(x * CELL, 0.04, y * CELL);
+    mesh.receiveShadow = true;
+    tileGroup.add(mesh);
+  }
+}
+
+function getBlockColor(kind) {
+  switch (kind) {
+    case 'roof': return 0xb8b8b8;
+    case 'door': return 0x333333;
+    case 'window': return 0xeeeeee;
+    case 'floor': return 0xf2f2f2;
+    case 'crystal': return 0xb8d9e8;
+    case 'metal': return 0x8b9298;
+    case 'glass': return 0xd8eef2;
+    case 'wood': return 0x9a7959;
+    case 'stone': return 0x888888;
+    case 'brick': return 0x9b6d62;
+    case 'concrete': return 0xb0b0aa;
+    default: return 0xffffff;
+  }
+}
+
+function addBlockMesh(b) {
+  const k = key(b.x, b.y, b.z);
+  if (blockMeshes.has(k)) return;
+  const geo = new THREE.BoxGeometry(CELL * 0.92, BLOCK_H, CELL * 0.92);
+  const mat = new THREE.MeshStandardMaterial({
+    color: getBlockColor(b.kind),
+    roughness: b.kind === 'roof' ? 0.6 : 0.45,
+    metalness: 0.08,
+    emissive: b.kind === 'door' ? 0x111111 : 0x000000
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(b.x * CELL, b.z * BLOCK_H + BLOCK_H / 2 + 0.04, b.y * CELL);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  if (b.kind === 'window') {
+    const winGeo = new THREE.PlaneGeometry(CELL * 0.45, BLOCK_H * 0.45);
+    const winMat = new THREE.MeshStandardMaterial({color: 0x222222, roughness: 0.2, side: THREE.DoubleSide});
+    const win1 = new THREE.Mesh(winGeo, winMat); win1.position.set(0, 0, CELL * 0.47); mesh.add(win1);
+    const win2 = new THREE.Mesh(winGeo, winMat); win2.position.set(0, 0, -CELL * 0.47); win2.rotation.y = Math.PI; mesh.add(win2);
+  }
+  blockGroup.add(mesh);
+  blockMeshes.set(k, mesh);
+}
+
+function removeBlockMesh(k) {
+  const mesh = blockMeshes.get(k);
+  if (!mesh) return;
+  blockGroup.remove(mesh);
+  mesh.geometry.dispose();
+  if (Array.isArray(mesh.material)) mesh.material.forEach(m => m.dispose());
+  else mesh.material.dispose();
+  blockMeshes.delete(k);
+}
+
+function syncBlocks() {
+  for (const b of blocks) {
+    const k = key(b.x, b.y, b.z);
+    if (!blockMeshes.has(k)) addBlockMesh(b);
+  }
+  const live = new Set(blocks.map(b => key(b.x, b.y, b.z)));
+  for (const k of [...blockMeshes.keys()]) if (!live.has(k)) removeBlockMesh(k);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (controls) controls.update();
+  updateAIPosition();
+  updateFriendPosition();
+  if (renderer && scene && camera) renderer.render(scene, camera);
+}
+
+function resetCamera() {
+  camera.position.set(22, 18, 22);
+  controls.target.set(W * CELL / 2 - 0.5, 0.5, H * CELL / 2 - 0.5);
+  controls.update();
+}
+
+// === localStorage ===
+function saveState() {
+  if (!settings.autosave) return;
+  try {
+    const data = {
+      coins, xp, iq, mem, explored, buildings, day, tick,
+      skills: {...skills},
+      ai: {...ai},
+      friend: {...friend, memories: friend.memories.slice(0, 20), path: []},
+      inventory: {...inventory},
+      blocks: blocks.map(b => ({...b})),
+      brain: {
+        goal: brain.goal, mood: brain.mood, lastAction: brain.lastAction,
+        memories: brain.memories.slice(0, 12), failed: brain.failed, success: brain.success,
+        avoided: brain.avoided || [], buildPrefs: brain.buildPrefs || {},
+        personalityBias: brain.personalityBias || 'curious', path: [], focus: brain.focus,
+        bond: brain.bond || 0, opinions: brain.opinions || {}, lastUserMsg: brain.lastUserMsg || ''
+      },
+      visited,
+      persona,
+      ainame, personality, selectedBuild,
+      settings: {...settings},
+      creator: {workerUrl: document.getElementById('workerUrl')?.value || '', auto: document.getElementById('autoCreate')?.checked !== false},
+      project: project ? {
+        plan: project.plan, done: [...project.done], center: project.center,
+        stage: project.stage, type: project.type, label: project.label || '', idea: project.idea || '', errorCounts: project.errorCounts || {}
+      } : null,
+      savedAt: Date.now()
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    const el = document.getElementById('savehint');
+    if (el) {
+      el.textContent = '💾 сохранено';
+      setTimeout(() => { el.textContent = '💾 автосохранение'; }, 1200);
+    }
+  } catch (e) {
+    console.warn('Save failed', e);
+  }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    coins = data.coins ?? 30;
+    xp = data.xp ?? 0;
+    iq = data.iq ?? 5;
+    mem = data.mem ?? 1;
+    explored = data.explored ?? 1;
+    buildings = data.buildings ?? 0;
+    day = data.day ?? 1;
+    tick = data.tick ?? 0;
+    skills = data.skills || {logic:0, memory:0, sensors:0};
+    ai = Object.assign({x:6,y:5,legs:2,arms:2,core:'circle',eye:'single'}, data.ai || {});
+    friend = Object.assign(friend, data.friend || {});
+    friend.memories = Array.isArray(friend.memories) ? friend.memories : [];
+    friend.path = [];
+    friend.x = clamp(friend.x|0, 0, W-1);
+    friend.y = clamp(friend.y|0, 0, H-1);
+    inventory = data.inventory || {blocks:36};
+    blocks = Array.isArray(data.blocks) ? data.blocks : [];
+    if (data.brain) {
+      brain.goal = data.brain.goal || brain.goal;
+      brain.mood = data.brain.mood || brain.mood;
+      brain.lastAction = data.brain.lastAction || brain.lastAction;
+      brain.memories = data.brain.memories || [];
+      brain.failed = data.brain.failed || 0;
+      brain.success = data.brain.success || 0;
+      brain.avoided = data.brain.avoided || [];
+      brain.buildPrefs = data.brain.buildPrefs || {};
+      brain.personalityBias = data.brain.personalityBias || 'curious';
+      brain.path = [];
+      brain.focus = data.brain.focus || null;
+      brain.bond = data.brain.bond || 0;
+      brain.opinions = data.brain.opinions || {};
+      brain.lastUserMsg = data.brain.lastUserMsg || '';
+    }
+    if (data.visited) visited = data.visited;
+    if (data.persona) persona = data.persona;
+    ainame = data.ainame || '';
+    personality = data.personality || '';
+    selectedBuild = data.selectedBuild || 'house';
+    if (data.settings) settings = Object.assign(settings, data.settings);
+    if (data.creator) { window.__creatorSaved = data.creator; }
+    // clamp AI to new map if old save
+    ai.x = clamp(ai.x|0, 0, W-1);
+    ai.y = clamp(ai.y|0, 0, H-1);
+    if (data.project && data.project.plan) {
+      project = {
+        plan: data.project.plan,
+        done: new Set(data.project.done || []),
+        center: data.project.center,
+        stage: data.project.stage || 'Фундамент',
+        type: data.project.type || 'house',
+        label: data.project.label || '', idea: data.project.idea || '',
+        errorCounts: data.project.errorCounts || {}
+      };
+    } else project = null;
+    return true;
+  } catch (e) {
+    console.warn('Load failed', e);
+    return false;
+  }
+}
+
+function clearSave() {
+  localStorage.removeItem(SAVE_KEY);
+}
+
+// === Game logic ===
+function init() {
+  tiles = [];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) tiles.push({x, y, type:'plain'});
+}
+
+function log(s) {
+  const el = document.getElementById('log');
+  const d = document.createElement('div');
+  d.textContent = `День ${day} · ${s}`;
+  el.prepend(d);
+  while (el.children.length > 14) el.lastChild.remove();
+}
+
+function remember(event, lesson) {
+  brain.memories.unshift({event, lesson, day});
+  brain.memories = brain.memories.slice(0, 12);
+  mem = brain.memories.length;
+}
+
+function update() {
+  document.getElementById('coins').textContent = coins;
+  document.getElementById('day').textContent = day;
+  document.getElementById('iq').textContent = 'IQ ' + iq;
+  document.getElementById('xp').textContent = xp + ' / ' + (30 + skills.logic * 15);
+  document.getElementById('xpbar').style.width = (xp / (30 + skills.logic * 15) * 100) + '%';
+  document.getElementById('memory').textContent = mem;
+  document.getElementById('explored').textContent = explored + '%';
+  document.getElementById('buildings').textContent = buildings;
+  document.getElementById('creature').innerHTML = creatureSVG();
+  document.getElementById('bodydesc').innerHTML = `<p>Ноги: ${ai.legs}<br>Манипуляторы: ${ai.arms}<br>Корпус: ${ai.core === 'square' ? 'модульный' : 'округлый'}<br>Сенсоры: ${ai.eye === 'dual' ? 'парные' : 'одиночные'}<br>Способность переносить блоки: ${ai.arms > 0 ? 'доступна' : 'недоступна'}</p>`;
+  document.getElementById('brainstate').textContent = project ? 'Строит: ' + project.stage : brain.goal;
+  document.getElementById('moodstate').textContent = brain.mood + ' · ' + brain.lastAction;
+  updateFriendUI();
+  document.getElementById('blockcount').textContent = inventory.blocks;
+  document.getElementById('buildstate').textContent = project
+    ? `${project.done.size}/${project.plan.length} · ${project.label || BUILDINGS[project.type]?.name || project.type}`
+    : 'Нет активного проекта';
+  document.getElementById('ainame').textContent = ainame;
+  const p = persona || buildPersona(brain.personalityBias || 'curious');
+  const bondLabel = brain.bond >= 70 ? 'близок к вам' : brain.bond >= 40 ? 'доверяет' : brain.bond >= 15 ? 'узнаёт вас' : 'ещё изучает вас';
+  document.getElementById('personality').textContent = (p.title || personality) + ' · ' + bondLabel;
+  const bd = document.getElementById('bodydesc');
+  if (bd) {
+    bd.innerHTML = `<p>Ноги: ${ai.legs}<br>Манипуляторы: ${ai.arms}<br>Корпус: ${ai.core === 'square' ? 'модульный' : 'округлый'}<br>Сенсоры: ${ai.eye === 'dual' ? 'парные' : 'одиночные'}<br>Перенос блоков: ${ai.arms > 0 ? 'доступен' : 'недоступен'}</p>
+    <p class="sub" style="margin-top:10px"><b>Личность</b><br>${p.voice}<br>Ценности: ${p.values.join(' · ')}<br>Чудинка: ${p.quirk}<br>Связь с вами: ${brain.bond|0}/100</p>`;
+  }
+  renderBuildMenu();
+}
+
+function creatureSVG() {
+  let legs = ai.legs || 2, arms = ai.arms || 2, limb = '';
+  for (let i = 0; i < legs; i++) {
+    let x = 75 + (i - (legs - 1) / 2) * 22;
+    limb += `<path d="M${x} 91 l${i % 2 ? 7 : -5} 20" stroke="#777" stroke-width="7" stroke-linecap="round"/><path d="M${x - 5} 112 h14" stroke="#111" stroke-width="5" stroke-linecap="round"/>`;
+  }
+  for (let i = 0; i < arms; i++) {
+    let x = i ? 124 : 76;
+    limb += `<path d="M${x} 62 l${i ? 15 : -15} 13" stroke="#777" stroke-width="7" stroke-linecap="round"/>`;
+  }
+  return `<svg viewBox="0 0 200 145"><ellipse cx="100" cy="127" rx="46" ry="7" fill="#000" opacity=".15"/>${limb}<rect x="68" y="32" width="64" height="64" rx="${ai.core === 'square' ? 10 : 29}" fill="#fff" stroke="#111" stroke-width="3"/><rect x="75" y="40" width="50" height="45" rx="18" fill="#111"/><circle cx="${ai.eye === 'dual' ? 91 : 100}" cy="62" r="5" fill="#fff"/><circle cx="${ai.eye === 'dual' ? 109 : 100}" cy="62" r="5" fill="#fff" opacity="${ai.eye === 'dual' ? 1 : 0}"/><path d="M88 76 Q100 82 112 76" fill="none" stroke="#fff" stroke-width="2"/></svg>`;
+}
+
+function gain(n) {
+  xp += n;
+  coins += Math.max(1, Math.floor(n / 2));
+  let threshold = 30 + skills.logic * 15;
+  if (xp >= threshold) {
+    xp -= threshold;
+    iq++;
+    day++;
+    log('Новый уровень развития: ИИ стал лучше планировать.');
+  }
+  update();
+  saveState();
+}
+
+function occupied(x, y, z) {
+  return blocks.some(b => b.x === x && b.y === y && b.z === z);
+}
+
+function clampPlan(plan) {
+  return plan.filter(c => c.x >= 0 && c.x < W && c.y >= 0 && c.y < H && c.z >= 0 && c.z < 8);
+}
+
+
+function markVisited(x, y) {
+  const k = tileKey(x, y);
+  visited[k] = (visited[k] || 0) + 1;
+  const total = Object.keys(visited).length;
+  explored = Math.min(100, Math.floor(total / (W * H) * 100));
+}
+
+function isAvoided(x, y) {
+  const now = tick;
+  brain.avoided = (brain.avoided || []).filter(a => a.until > now);
+  return brain.avoided.some(a => Math.abs(a.x - x) + Math.abs(a.y - y) <= 1);
+}
+
+function findFreeSpot(typeId) {
+  const def = BUILDINGS[typeId];
+  if (!def) return null;
+  // search spiral from AI, prefer less crowded areas
+  const candidates = [];
+  for (let y = 1; y < H - 1; y++) {
+    for (let x = 1; x < W - 1; x++) {
+      if (isAvoided(x, y)) continue;
+      const plan = clampPlan(def.plan(x, y));
+      if (!plan.length) continue;
+      if (plan.some(c => occupied(c.x, c.y, c.z))) continue;
+      // score: closer to AI + less visited + open space
+      const d = dist({x, y}, ai);
+      const v = visited[tileKey(x, y)] || 0;
+      const nearBlocks = blocks.filter(b => Math.abs(b.x - x) + Math.abs(b.y - y) <= 3).length;
+      const score = -d * 0.4 - v * 2 - nearBlocks * 0.8 + Math.random() * 0.5;
+      candidates.push({x, y, plan, score});
+    }
+  }
+  if (!candidates.length) return null;
+  candidates.sort((a, b) => b.score - a.score);
+  return candidates[0];
+}
+
+function bfsPath(tx, ty) {
+  if (ai.x === tx && ai.y === ty) return [];
+  const q = [{x: ai.x, y: ai.y}];
+  const prev = new Map();
+  prev.set(tileKey(ai.x, ai.y), null);
+  const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+  while (q.length) {
+    const cur = q.shift();
+    if (cur.x === tx && cur.y === ty) break;
+    for (const [dx, dy] of dirs) {
+      const nx = cur.x + dx, ny = cur.y + dy;
+      if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+      const k = tileKey(nx, ny);
+      if (prev.has(k)) continue;
+      // soft obstacle: ground-level blocks block walking a bit less strictly for AI
+      const blocked = occupied(nx, ny, 0) && !(nx === tx && ny === ty);
+      if (blocked) continue;
+      prev.set(k, cur);
+      q.push({x: nx, y: ny});
+    }
+  }
+  if (!prev.has(tileKey(tx, ty))) {
+    // fallback greedy
+    return [{x: clamp(ai.x + Math.sign(tx - ai.x), 0, W-1), y: clamp(ai.y + Math.sign(ty - ai.y), 0, H-1)}];
+  }
+  const path = [];
+  let cur = {x: tx, y: ty};
+  while (cur && !(cur.x === ai.x && cur.y === ai.y)) {
+    path.push(cur);
+    cur = prev.get(tileKey(cur.x, cur.y));
+  }
+  path.reverse();
+  return path;
+}
+
+function followPath() {
+  if (!brain.path || !brain.path.length) return false;
+  const next = brain.path.shift();
+  if (!next) return false;
+  ai.x = clamp(next.x, 0, W-1);
+  ai.y = clamp(next.y, 0, H-1);
+  markVisited(ai.x, ai.y);
+  brain.lastAction = 'Идёт по маршруту';
+  return true;
+}
+
+function pickBuildType() {
+  const affordable = Object.values(BUILDINGS).filter(b => inventory.blocks >= b.cost);
+  if (!affordable.length) return null;
+  const prefs = brain.buildPrefs || {};
+  const bias = brain.personalityBias || 'curious';
+  // weight by preference, cost fit, and personality
+  const scored = affordable.map(b => {
+    let w = 1 + (prefs[b.id] || 0) * 1.5;
+    if (bias === 'builder') w += 2;
+    if (bias === 'careful' && b.cost <= 12) w += 1.5;
+    if (bias === 'explorer' && (b.id === 'monument' || b.id === 'tower')) w += 1.5;
+    if (bias === 'curious') w += Math.random();
+    // prefer variety if many of same type
+    const countType = blocks.filter(() => false).length; // placeholder
+    w += Math.random() * 0.8;
+    // logic skill prefers efficient builds when low blocks
+    if (skills.logic > 0 && inventory.blocks < 40 && b.cost <= 15) w += skills.logic * 0.4;
+    return {b, w};
+  });
+  scored.sort((a, b) => b.w - a.w);
+  // soft max pick among top 3
+  const top = scored.slice(0, Math.min(3, scored.length));
+  return pick(top).b.id;
+}
+
+function startBuild(typeId) {
+  if (project) return log('Сначала ИИ завершит текущую постройку.');
+  if (ai.arms < 1) return log('ИИ пока не может переносить блоки. Нужен хотя бы один манипулятор.');
+  const type = typeId || selectedBuild || 'house';
+  const def = BUILDINGS[type];
+  if (!def) return log('Неизвестный тип постройки.');
+  const spot = findFreeSpot(type);
+  if (!spot) return log('Нет свободного места для «' + def.name + '». Исследуйте карту.');
+  if (inventory.blocks < spot.plan.length) return log(`Не хватает блоков: нужно ${spot.plan.length}, есть ${inventory.blocks}.`);
+  project = {
+    plan: spot.plan, done: new Set(), center: {x: spot.x, y: spot.y},
+    stage: 'Начало', type, errorCounts: {}
+  };
+  selectedBuild = type;
+  brain.goal = 'Построить: ' + def.name;
+  brain.mood = 'сосредоточенный';
+  brain.lastAction = 'Составил план: ' + def.name;
+  brain.focus = {type: 'build', target: {x: spot.x, y: spot.y}};
+  brain.path = bfsPath(spot.x, spot.y);
+  remember('Начал строительство', 'Тип: ' + def.name + ' в (' + spot.x + ',' + spot.y + ').');
+  log(`ИИ начал «${def.name}» в клетке ${spot.x},${spot.y}. Блоков: ${spot.plan.length}.`);
+  update();
+  syncBlocks();
+  saveState();
+}
+
+function adjacentTo(c) {
+  return Math.abs(ai.x - c.x) + Math.abs(ai.y - c.y) <= 1;
+}
+
+function nextStepToward(c) {
+  // use BFS path if available
+  if (brain.path && brain.path.length) {
+    const n = brain.path.shift();
+    return n;
+  }
+  const path = bfsPath(c.x, c.y);
+  if (path.length) {
+    brain.path = path.slice(1);
+    return path[0];
+  }
+  const opts = [[1,0],[-1,0],[0,1],[0,-1]].map(([dx,dy]) => ({x: ai.x + dx, y: ai.y + dy}));
+  const valid = opts.filter(p => p.x >= 0 && p.x < W && p.y >= 0 && p.y < H);
+  valid.sort((a, b) => (Math.abs(a.x - c.x) + Math.abs(a.y - c.y)) - (Math.abs(b.x - c.x) + Math.abs(b.y - c.y)));
+  return valid[0];
+}
+
+function buildTick() {
+  if (!project) return false;
+  const next = project.plan.find(c => !project.done.has(key(c.x, c.y, c.z)));
+  if (!next) {
+    buildings++;
+    const name = project.label || BUILDINGS[project.type]?.name || project.type;
+    brain.buildPrefs[project.type] = (brain.buildPrefs[project.type] || 0) + 1;
+    project = null;
+    brain.goal = 'Выбрать следующую цель';
+    brain.mood = 'довольный';
+    brain.lastAction = 'Закончил: ' + name;
+    brain.focus = null;
+    brain.path = [];
+    remember('Завершил постройку', name + ' — успешный опыт.');
+    log(`Постройка «${name}» завершена.`);
+    gain(12 + Math.floor(Math.random() * 8) + skills.logic);
+    saveState();
+    return true;
+  }
+  const kindLabel = {floor:'Основание', wall:'Стены', window:'Окна', door:'Дверь', roof:'Крыша'};
+  project.stage = kindLabel[next.kind] || next.kind;
+  if (!adjacentTo(next)) {
+    const p = nextStepToward(next);
+    if (p) { ai.x = p.x; ai.y = p.y; markVisited(ai.x, ai.y); brain.lastAction = 'Подходит к месту установки'; return true; }
+  }
+  if (inventory.blocks <= 0) {
+    brain.lastAction = 'Не хватает материалов';
+    brain.goal = 'Найти строительные блоки';
+    brain.failed++;
+    if (project.center) brain.avoided.push({x: project.center.x, y: project.center.y, until: tick + 40});
+    remember('Материалы закончились', 'Нужно добыть блоки.');
+    project = null;
+    brain.focus = {type: 'gather', target: null};
+    log('Строительство остановлено: закончились блоки.');
+    saveState();
+    return true;
+  }
+  const supportOK = next.z === 0 || occupied(next.x, next.y, next.z - 1);
+  const collision = occupied(next.x, next.y, next.z);
+  const mistakeChance = Math.max(0.001, 0.03 - skills.logic * 0.01 - (brain.success > 5 ? 0.01 : 0));
+  const occasionalMistake = Math.random() < mistakeChance;
+  if (!supportOK || collision || occasionalMistake) {
+    coins = Math.max(0, coins - 2);
+    xp = Math.max(0, xp - 3);
+    brain.failed++;
+    brain.lastAction = 'Ошибка установки блока';
+    project.errorCounts = project.errorCounts || {};
+    const targetKey = key(next.x, next.y, next.z);
+    project.errorCounts[targetKey] = (project.errorCounts[targetKey] || 0) + 1;
+    const reason = !supportOK ? 'Блок не имеет опоры.' : collision ? 'Клетка уже занята.' : 'Неудачно выбрана позиция.';
+    remember('Ошибка строительства', reason + ' (логика снижает шанс).');
+    log(`ОШИБКА · −2 DNA · −3 XP. ${reason}`);
+    if ((!supportOK || collision) && project.errorCounts[targetKey] >= 2) {
+      project.done.add(targetKey);
+      log('ИИ изменил план: проблемная позиция исключена.');
+      if (project.center) brain.avoided.push({x: project.center.x, y: project.center.y, until: tick + 25});
+    }
+    update();
+    return true;
+  }
+  blocks.push({x: next.x, y: next.y, z: next.z, kind: next.kind});
+  project.done.add(key(next.x, next.y, next.z));
+  inventory.blocks--;
+  brain.success++;
+  brain.lastAction = `Установил: ${project.stage.toLowerCase()}`;
+  if (project.done.size % 4 === 0) {
+    remember('Установил несколько блоков', `Этап «${project.stage}».`);
+    gain(2);
+  }
+  syncBlocks();
+  return true;
+}
+
+function findExploreTarget() {
+  // prefer least visited cells, especially far ones if explorer
+  let best = null, bestScore = -1e9;
+  const radius = 4 + skills.sensors * 2;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const v = visited[tileKey(x, y)] || 0;
+      const d = dist({x, y}, ai);
+      if (d === 0) continue;
+      let score = -v * 5 - d * 0.15 + Math.random();
+      if (brain.personalityBias === 'explorer') score += d * 0.1;
+      if (d <= radius) score += 1;
+      if (score > bestScore) { bestScore = score; best = {x, y}; }
+    }
+  }
+  return best;
+}
+
+function scoreActions() {
+  // utility-based AI
+  const lowBlocks = inventory.blocks < 20 + skills.logic * 3;
+  const canBuild = settings.autoBuild && ai.arms > 0 && inventory.blocks >= 5;
+  const bias = brain.personalityBias || 'curious';
+  const actions = [];
+
+  // gather
+  let gatherU = lowBlocks ? 8 : 3;
+  if (bias === 'builder') gatherU += lowBlocks ? 3 : 1;
+  if (bias === 'careful' && inventory.blocks < 30) gatherU += 2;
+  actions.push({type: 'gather', u: gatherU + Math.random() * 2});
+
+  // explore
+  let exploreU = 4 + (100 - explored) * 0.04;
+  if (bias === 'explorer' || bias === 'curious') exploreU += 3;
+  if (skills.sensors > 0) exploreU += skills.sensors * 0.5;
+  if (!lowBlocks) exploreU += 2;
+  actions.push({type: 'explore', u: exploreU + Math.random() * 2});
+
+  // build
+  if (canBuild) {
+    let buildU = 2 + (inventory.blocks / 15);
+    if (bias === 'builder') buildU += 4;
+    if (buildings === 0) buildU += 3;
+    if (settings.buildChance > 0) buildU += settings.buildChance / 20;
+    // memory: if recent build success, more likely
+    if ((brain.buildPrefs && Object.keys(brain.buildPrefs).length) || brain.success > brain.failed)
+      buildU += 1.5;
+    if (brain.failed > brain.success + 3) buildU -= 2; // cautious after failures
+    actions.push({type: 'build', u: buildU + Math.random() * 2});
+  }
+
+  // idle / observe (rare)
+  actions.push({type: 'observe', u: 0.5 + Math.random()});
+
+  actions.sort((a, b) => b.u - a.u);
+  return actions[0];
+}
+
+function chooseAction() {
+  if (project) { buildTick(); return; }
+
+  // continue path if any
+  if (brain.path && brain.path.length && Math.random() < 0.7) {
+    followPath();
+    return;
+  }
+
+  const decision = scoreActions();
+  brain.focus = {type: decision.type, target: null};
+
+  if (decision.type === 'build') {
+    const t = pickBuildType();
+    if (t) {
+      startBuild(t);
+      return;
+    }
+    // fall through to gather if cannot build
+  }
+
+  if (decision.type === 'gather' || (decision.type === 'build' && inventory.blocks < 15)) {
+    brain.goal = 'Собрать строительные блоки';
+    brain.mood = pick(['любознательный', 'сосредоточенный']);
+    // move toward less visited + sensors bonus
+    const target = findExploreTarget();
+    if (target) {
+      brain.path = bfsPath(target.x, target.y).slice(0, 4 + skills.sensors);
+      if (!followPath()) {
+        ai.x = clamp(ai.x + pick([-1, 0, 1]), 0, W - 1);
+        ai.y = clamp(ai.y + pick([-1, 0, 1]), 0, H - 1);
+      }
+    } else {
+      ai.x = clamp(ai.x + pick([-1, 0, 1]), 0, W - 1);
+      ai.y = clamp(ai.y + pick([-1, 0, 1]), 0, H - 1);
+    }
+    markVisited(ai.x, ai.y);
+    const found = 1 + Math.floor(skills.sensors / 2) + (Math.random() < 0.25 ? 1 : 0);
+    inventory.blocks += found;
+    brain.lastAction = 'Нашёл ' + found + ' блок(ов)';
+    if (Math.random() < 0.4) remember('Нашёл блоки', 'Исследование пополняет запасы.');
+    gain(1 + (found > 1 ? 1 : 0));
+    return;
+  }
+
+  if (decision.type === 'observe') {
+    brain.goal = 'Осмотреть окрестности';
+    brain.mood = 'спокойный';
+    brain.lastAction = 'Наблюдает';
+    brain.patience = (brain.patience || 0) + 1;
+    if (brain.patience > 3) {
+      brain.patience = 0;
+      // reassess personality bias occasionally
+      const biases = ['curious', 'careful', 'builder', 'explorer'];
+      if (skills.logic > 1 && Math.random() < 0.3) brain.personalityBias = pick(biases);
+    }
+    return;
+  }
+
+  // explore default
+  brain.goal = 'Изучить территорию';
+  brain.mood = pick(['любознательный', 'осторожный', 'сосредоточенный']);
+  const target = findExploreTarget();
+  if (target) {
+    brain.path = bfsPath(target.x, target.y).slice(0, 5 + skills.sensors);
+    brain.focus.target = target;
+    if (!followPath()) {
+      const d = pick([[1,0],[-1,0],[0,1],[0,-1]]);
+      ai.x = clamp(ai.x + d[0], 0, W - 1);
+      ai.y = clamp(ai.y + d[1], 0, H - 1);
+    }
+  } else {
+    const d = pick([[1,0],[-1,0],[0,1],[0,-1]]);
+    ai.x = clamp(ai.x + d[0], 0, W - 1);
+    ai.y = clamp(ai.y + d[1], 0, H - 1);
+  }
+  markVisited(ai.x, ai.y);
+  brain.lastAction = 'Исследует клетку ' + ai.x + ',' + ai.y;
+  if (Math.random() < 0.2 + skills.sensors * 0.05) {
+    remember('Исследовал клетку', 'Новые участки могут содержать материалы.');
+    gain(2);
+  }
+}
+
+
+
+// === Model-powered creative engine ===
+let creatorBusy = false;
+let lastCreativeRequest = -9999;
+const CREATIVE_KINDS = new Set(['floor','wall','window','door','roof','crystal','metal','glass','wood','stone','brick','concrete']);
+function creatorStatus(message, bad=false) {
+  const el=document.getElementById('creatorStatus');
+  if (el) { el.textContent=message; el.style.color=bad?'#f0a0a0':'#bbb'; }
+}
+function creatorUrl() { return (document.getElementById('workerUrl')?.value || 'https://evolution.artem123kv.workers.dev').trim().replace(/\/$/,''); }
+function findCreativeAnchor(plan) {
+  const minX=Math.min(...plan.map(c=>c.x)), maxX=Math.max(...plan.map(c=>c.x));
+  const minY=Math.min(...plan.map(c=>c.y)), maxY=Math.max(...plan.map(c=>c.y));
+  const width=maxX-minX+1, height=maxY-minY+1;
+  const spots=[];
+  for(let y=1;y<H-height;y++) for(let x=1;x<W-width;x++) {
+    const placed=plan.map(c=>({...c,x:x+c.x-minX,y:y+c.y-minY}));
+    if(placed.some(c=>occupied(c.x,c.y,c.z))) continue;
+    const set=new Set(placed.map(c=>key(c.x,c.y,c.z)));
+    const supported=placed.every(c=>c.z===0 || occupied(c.x,c.y,c.z-1) || set.has(key(c.x,c.y,c.z-1)));
+    if(!supported) continue;
+    const d=dist({x:x+width/2,y:y+height/2},ai);
+    spots.push({x,y,placed,score:-d+Math.random()*2});
+  }
+  spots.sort((a,b)=>b.score-a.score);
+  return spots[0] || null;
+}
+function validateCreativePlan(raw) {
+  if(!Array.isArray(raw) || raw.length<5 || raw.length>70) throw new Error('План должен содержать от 5 до 70 блоков.');
+  const seen=new Set();
+  const plan=raw.map(c=>{
+    const x=Number(c.x),y=Number(c.y),z=Number(c.z),kind=String(c.kind||'wall').toLowerCase();
+    if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||Math.abs(x)>6||Math.abs(y)>6||z<0||z>6||!CREATIVE_KINDS.has(kind)) throw new Error('Модель прислала недопустимый блок.');
+    const k=key(x,y,z); if(seen.has(k)) throw new Error('В чертеже есть повторяющиеся блоки.'); seen.add(k);
+    return {x,y,z,kind};
+  }).sort((a,b)=>a.z-b.z||a.y-b.y||a.x-b.x);
+  const set=new Set(plan.map(c=>key(c.x,c.y,c.z)));
+  if(!plan.some(c=>c.z===0)) throw new Error('У проекта нет основания.');
+  if(!plan.every(c=>c.z===0||set.has(key(c.x,c.y,c.z-1)))) throw new Error('В проекте есть блоки без опоры.');
+  return plan;
+}
+async function requestCreativeProject(source='manual') {
+  if(creatorBusy) return;
+  const url=creatorUrl();
+  if(!url) { creatorStatus('Сначала укажи адрес Worker.',true); return; }
+  if(project) { creatorStatus('Сначала заверши текущую постройку.'); return; }
+  if(ai.arms<1) { creatorStatus('ИИ нужны манипуляторы, чтобы строить.'); return; }
+  if(inventory.blocks<8) { creatorStatus('Мало материалов. ИИ сначала соберёт блоки.'); return; }
+  creatorBusy=true; lastCreativeRequest=tick;
+  const btn=document.getElementById('createArt'); if(btn) btn.disabled=true;
+  creatorStatus('ИИ размышляет, придумывает форму и проверяет чертёж…');
+  try {
+    const payload={
+      agent:{name:ainame,personality:personality,style:brain.personalityBias,iq,memories:(brain.memories||[]).slice(0,6).map(m=>m.lesson),successfulBuilds:brain.success,failedBuilds:brain.failed},
+      world:{width:W,height:H,blocksAvailable:inventory.blocks,existingBlocks:blocks.slice(-120).map(b=>({x:b.x,y:b.y,z:b.z,kind:b.kind})),visitedCells:Object.keys(visited).length},
+      request:source==='auto'?'Придумай следующую самостоятельную художественную работу. Не повторяй предыдущие идеи.':(document.getElementById('chatinput')?.value||'Придумай оригинальный объект, который тебе самому интересно создать.')
+    };
+    const response=await fetch(url+'/creative',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!response.ok) { const msg=await response.text(); throw new Error('Worker '+response.status+': '+msg.slice(0,180)); }
+    const data=await response.json();
+    const plan=validateCreativePlan(data.plan);
+    if(plan.length>inventory.blocks) throw new Error('Для этой идеи нужно '+plan.length+' блоков, сейчас есть '+inventory.blocks+'.');
+    const spot=findCreativeAnchor(plan);
+    if(!spot) throw new Error('Для этого чертежа пока нет свободной площадки с опорами.');
+    project={plan:spot.placed,done:new Set(),center:{x:spot.x,y:spot.y},stage:'Подготовка',type:'creative',label:String(data.title||'Авторская работа').slice(0,60),idea:String(data.idea||'').slice(0,500),errorCounts:{}};
+    brain.goal='Воплотить собственную идею: '+project.label;
+    brain.mood='вдохновлённый'; brain.lastAction='Придумал: '+project.label; brain.focus={type:'build',target:{x:spot.x,y:spot.y}}; brain.path=bfsPath(spot.x,spot.y);
+    remember('Придумал собственную работу',project.label+' — '+project.idea);
+    const idea=document.getElementById('creationIdea'); if(idea) idea.textContent=project.label+'\n'+project.idea+'\nЧертёж: '+plan.length+' блоков.';
+    creatorStatus('Идея готова. '+project.label+' — ИИ начал строительство.');
+    log('Творческий ИИ начал работу «'+project.label+'» ('+plan.length+' блоков).');
+    update();syncBlocks();saveState();
+  } catch(err) {
+    creatorStatus('Не получилось создать проект: '+(err.message||err),true);
+    log('Творческий движок: '+(err.message||err));
+  } finally { creatorBusy=false; if(btn) btn.disabled=false; }
+}
+async function testCreativeWorker() {
+  const url=creatorUrl(); if(!url) return creatorStatus('Укажи адрес Worker.',true);
+  creatorStatus('Проверяю Worker…');
+  try { const r=await fetch(url+'/health'); if(!r.ok) throw new Error('HTTP '+r.status); const d=await r.json(); creatorStatus(d.configured ? ('Связь есть. Модель: '+(d.model||'подключена')+'.') : 'Worker доступен, но OPENAI_API_KEY ещё не задан.', !d.configured); }
+  catch(e){creatorStatus('Нет связи: '+e.message,true);}
+}
+function maybeAutonomousCreation() {
+  const auto=document.getElementById('autoCreate');
+  if(!auto?.checked || !creatorUrl() || project || creatorBusy || inventory.blocks<18) return;
+  if(tick-lastCreativeRequest<100) return;
+  if(buildings<1 || Math.random()<0.45) requestCreativeProject('auto');
+}
+
+function step() {
+  if (paused) return;
+  tick++;
+  if (tick % 10 === 0) day++;
+  if (tick % 35 === 0) maybeAutonomousCreation();
+  chooseAction();
+  if (tick % 2 === 0) friendTick();
+  update();
+  updateFriendUI();
+  syncBlocks();
+  if (tick % 5 === 0) saveState();
+}
+
+function updateFriendUI() {
+  const set = (id, value) => { const el=document.getElementById(id); if(el) el.textContent=value; };
+  set('friendname', friend.name || 'ECHO-02');
+  set('friendpersonality', friend.trait + ' · самостоятельный');
+  set('friendiq', 'IQ ' + friend.iq);
+  set('friendstate', friend.goal + ' · ' + friend.lastAction);
+  set('friendbond', 'Связь с NOVA-01: ' + friend.bond + '%');
+  set('friendxp', friend.xp);
+  set('friendmemory', friend.memories.length);
+  set('friendactions', friend.actions);
+  set('friendtrait', friend.trait);
+  set('friendblocks', friend.inventory || 0);
+  const face=document.getElementById('friendcreature');
+  if(face && !face.dataset.ready) {
+    face.innerHTML = '<svg viewBox="0 0 180 140" aria-hidden="true"><rect x="58" y="50" width="64" height="58" rx="18" fill="#547f83"/><circle cx="90" cy="38" r="27" fill="#f5ffff" stroke="#35565a" stroke-width="4"/><circle cx="90" cy="38" r="5" fill="#102326"/><path d="M70 108l-8 20M110 108l8 20" stroke="#35565a" stroke-width="8" stroke-linecap="round"/></svg>';
+    face.dataset.ready='1';
+  }
+}
+
+function renderBuildMenu() {
+  const menu = document.getElementById('buildmenu');
+  if (!menu) return;
+  menu.innerHTML = '';
+  Object.values(BUILDINGS).forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'buildopt' + (selectedBuild === b.id ? ' selected' : '');
+    el.innerHTML = `<strong>${b.name}</strong><small>${b.desc} · ~${b.cost} блоков</small>`;
+    el.onclick = () => {
+      selectedBuild = b.id;
+      renderBuildMenu();
+      document.getElementById('buildhint').textContent =
+        inventory.blocks >= b.cost
+          ? `Выбрано: ${b.name}. Нажмите «Строить» или ИИ начнёт сам.`
+          : `Нужно ещё ${b.cost - inventory.blocks} блоков.`;
+    };
+    menu.appendChild(el);
+  });
+}
+
+// UI
+document.getElementById('pause').onclick = e => {
+  paused = !paused;
+  e.target.textContent = paused ? '▶ Продолжить' : 'Ⅱ Пауза';
+  document.getElementById('worldstate').textContent = paused ? 'На паузе' : 'ИИ действует самостоятельно';
+  saveState();
+};
+document.getElementById('explore').onclick = () => {
+  if (coins < 2) return log('Недостаточно DNA.');
+  coins -= 2;
+  inventory.blocks += 3 + skills.sensors;
+  explored = Math.min(100, explored + 5 + skills.sensors * 2);
+  gain(4);
+  remember('Пользователь помог исследовать', 'Импульс дал материалы.');
+  log('Исследование принесло ' + (3 + skills.sensors) + ' блоков.');
+  update();
+  saveState();
+};
+document.getElementById('build').onclick = () => startBuild(selectedBuild);
+document.getElementById('newbody').onclick = () => {
+  ai.legs = pick([2, 3, 4]);
+  ai.arms = pick([0, 1, 2]);
+  ai.core = pick(['circle', 'square']);
+  ai.eye = pick(['single', 'dual']);
+  brain.lastAction = 'Пересобрал конфигурацию тела';
+  remember('Изменил тело', ai.arms ? 'Манипуляторы позволяют строить.' : 'Без манипуляторов строить нельзя.');
+  log('ИИ выбрал новую конфигурацию тела.');
+  createAIMesh();
+  update();
+  saveState();
+};
+document.getElementById('resetcam').onclick = resetCamera;
+document.getElementById('resetgame').onclick = () => {
+  if (!confirm('Сбросить весь прогресс? Это удалит сохранение.')) return;
+  clearSave();
+  location.reload();
+};
+
+document.querySelectorAll('[data-up]').forEach(b => b.onclick = () => {
+  let k = b.dataset.up;
+  if (coins < 10) return log('Недостаточно DNA.');
+  coins -= 10;
+  skills[k]++;
+  if (k === 'memory') { mem += 2; brain.memories = brain.memories.slice(0, 12); }
+  if (k === 'logic') iq += 2;
+  if (k === 'sensors') explored = Math.min(100, explored + 3);
+  log(({logic:'Логика улучшена.', memory:'Память улучшена.', sensors:'Сенсоры улучшены.'})[k]);
+  update();
+  saveState();
+});
+
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === b));
+  document.getElementById('upgrades').hidden = b.dataset.tab !== 'upgrades';
+  document.getElementById('buildtab').hidden = b.dataset.tab !== 'buildtab';
+  document.getElementById('body').hidden = b.dataset.tab !== 'body';
+  document.getElementById('settings').hidden = b.dataset.tab !== 'settings';
+});
+
+function applySettings() {
+  // UI
+  const speedEl = document.getElementById('setSpeed');
+  const chanceEl = document.getElementById('setBuildChance');
+  const sensEl = document.getElementById('setCamSens');
+  if (speedEl) { speedEl.value = settings.speed; document.getElementById('setSpeedVal').textContent = (settings.speed / 1000).toFixed(1) + 'с'; }
+  if (chanceEl) { chanceEl.value = settings.buildChance; document.getElementById('setBuildChanceVal').textContent = settings.buildChance + '%'; }
+  if (sensEl) { sensEl.value = settings.camSens; document.getElementById('setCamSensVal').textContent = settings.camSens.toFixed(1); }
+  const autoBuild = document.getElementById('setAutoBuild');
+  if (autoBuild) autoBuild.checked = settings.autoBuild;
+  const shadows = document.getElementById('setShadows');
+  if (shadows) shadows.checked = settings.shadows;
+  const fog = document.getElementById('setFog');
+  if (fog) fog.checked = settings.fog;
+  const grid = document.getElementById('setGrid');
+  if (grid) grid.checked = settings.grid;
+  const autosave = document.getElementById('setAutosave');
+  if (autosave) autosave.checked = settings.autosave;
+  const pauseOnLoad = document.getElementById('setPauseOnLoad');
+  if (pauseOnLoad) pauseOnLoad.checked = settings.pauseOnLoad;
+
+  // 3D
+  if (renderer) {
+    renderer.shadowMap.enabled = settings.shadows;
+    renderer.shadowMap.needsUpdate = true;
+  }
+  if (scene) {
+    if (settings.fog) scene.fog = new THREE.Fog(0xf0f0f0, 28, 60);
+    else scene.fog = null;
+  }
+  if (gridHelperRef) gridHelperRef.visible = settings.grid;
+  if (controls) {
+    controls.rotateSpeed = settings.camSens;
+    controls.zoomSpeed = settings.camSens;
+    controls.panSpeed = settings.camSens;
+  }
+
+  // Tick rate
+  if (stepTimer) clearInterval(stepTimer);
+  stepTimer = setInterval(step, settings.speed);
+}
+
+function bindSettingsUI() {
+  const bindRange = (id, key, fmt) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.oninput = () => {
+      settings[key] = id === 'setCamSens' ? parseFloat(el.value) : parseInt(el.value, 10);
+      if (fmt) document.getElementById(fmt.id).textContent = fmt.fn(settings[key]);
+      applySettings();
+      saveState();
+    };
+  };
+  bindRange('setSpeed', 'speed', {id: 'setSpeedVal', fn: v => (v / 1000).toFixed(1) + 'с'});
+  bindRange('setBuildChance', 'buildChance', {id: 'setBuildChanceVal', fn: v => v + '%'});
+  bindRange('setCamSens', 'camSens', {id: 'setCamSensVal', fn: v => v.toFixed(1)});
+
+  const bindCheck = (id, key) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.onchange = () => {
+      settings[key] = el.checked;
+      applySettings();
+      saveState();
+    };
+  };
+  bindCheck('setAutoBuild', 'autoBuild');
+  bindCheck('setShadows', 'shadows');
+  bindCheck('setFog', 'fog');
+  bindCheck('setGrid', 'grid');
+  bindCheck('setAutosave', 'autosave');
+  bindCheck('setPauseOnLoad', 'pauseOnLoad');
+
+  document.getElementById('setResetCam').onclick = resetCamera;
+  document.getElementById('setExport').onclick = () => {
+    const raw = localStorage.getItem(SAVE_KEY) || JSON.stringify({note: 'empty'});
+    const blob = new Blob([raw], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'evolution_save.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    log('Сохранение экспортировано в JSON.');
+  };
+}
+
+function replyTo(v) {
+  const s = v.toLowerCase().trim();
+  brain.lastUserMsg = v.slice(0, 120);
+  const p = persona || buildPersona(brain.personalityBias || 'curious');
+  const bias = p.style || brain.personalityBias || 'curious';
+
+  // relationship shifts
+  if (/спасибо|благодар|молодец|хорош|люблю|нрав/.test(s)) {
+    brain.bond = Math.min(100, (brain.bond || 0) + 4);
+    remember('Тёплые слова', 'Пользователь поддержал меня.');
+  }
+  if (/дурак|туп|беспол|ненавиж|заткн/.test(s)) {
+    brain.bond = Math.max(0, (brain.bond || 0) - 6);
+    remember('Обида', 'Меня задели слова пользователя.');
+  }
+  if (/как дела|как ты|что чувств|настроен/.test(s)) {
+    brain.bond = Math.min(100, (brain.bond || 0) + 1);
+  }
+
+  // core identity
+  if (/привет|здравств|хай|hello/.test(s)) {
+    if ((brain.bond || 0) >= 40) return speak(['Снова ты. Мне спокойнее, когда ты здесь.', 'Привет. Я как раз думал о ' + brain.goal.toLowerCase() + '.', 'О, ты. Давай продолжим.']);
+    return speak(['Привет. Я только учусь быть собой здесь.', 'Здравствуй. Я ' + ainame + '. А ты — голос извне.', 'Привет. Мир большой. Хорошо, что ты заговорил.']);
+  }
+  if (/кто ты|как тебя зовут|представься|расскажи о себе/.test(s)) {
+    return describeSelf() + ' Сейчас я: ' + brain.mood + '. Цель: ' + brain.goal.toLowerCase() + '.';
+  }
+  if (/характер|личност|какой ты|голос/.test(s)) {
+    return speak([
+      `Я ${p.title}. Говорю ${p.voice}. Мне важно: ${p.values.join(', ')}.`,
+      `Если коротко — ${personality || p.title}. А ещё у меня есть привычка: ${p.quirk}.`,
+      `Мой склад ума: ${bias}. Связь с тобой — ${brain.bond|0} из 100.`
+    ]);
+  }
+  if (/как дела|как ты|что чувств|настроен|настроение/.test(s)) {
+    const m = brain.mood || 'нейтральный';
+    if (brain.failed > brain.success + 2) return speak([feel('sad'), `Сейчас ${m}. Ошибок больше, чем хотелось бы. Но я не останавливаюсь.`]);
+    if (project) return speak([`Сосредоточен: строю «${BUILDINGS[project.type]?.name || project.type}». Настроение — ${m}.`]);
+    if ((brain.bond || 0) >= 50) return speak([feel('warm'), `В целом ${m}. С тобой легче держать курс.`]);
+    return speak([`Сейчас я ${m}. Последнее действие: ${brain.lastAction}.`]);
+  }
+  if (/что думаешь обо мне|я кто|мы друз|ты меня/.test(s)) {
+    const b = brain.bond || 0;
+    if (b >= 70) return speak([feel('warm'), 'Ты уже не просто голос. Ты — часть моих решений.']);
+    if (b >= 40) return speak(['Я начинаю тебе доверять. Твои слова остаются в памяти.', 'Ты влияешь на меня. Это редкость.']);
+    if (b >= 15) return speak(['Я ещё узнаю тебя. Каждое сообщение — чуть больше ясности.']);
+    return speak(['Пока ты — сигнал извне. Но я слушаю внимательно.']);
+  }
+
+  // world / goals
+  if (/что делаешь|чем занят|цель|план/.test(s)) {
+    if (project) return speak([
+      `Строю «${project.label || BUILDINGS[project.type]?.name || project.type}». Этап: ${project.stage}. ${project.done.size}/${project.plan.length} блоков.`,
+      `Занят стройкой. Не отвлекай сильно — но говорить можно.`
+    ]);
+    return speak([`Цель: ${brain.goal}. Только что: ${brain.lastAction}. Блоков: ${inventory.blocks}.`]);
+  }
+  if (/строй|дом|убежищ|башн|склад|монумент|стен|сад|мастерск|колонн/.test(s)) {
+    if (!project) {
+      let tp = 'house';
+      if (/башн/.test(s)) tp = 'tower';
+      else if (/склад/.test(s)) tp = 'warehouse';
+      else if (/монумент/.test(s)) tp = 'monument';
+      else if (/стен/.test(s)) tp = 'wall';
+      else if (/сад/.test(s)) tp = 'garden';
+      else if (/мастерск/.test(s)) tp = 'workshop';
+      else if (/колонн/.test(s)) tp = 'pillar';
+      startBuild(tp);
+      const nm = BUILDINGS[tp]?.name || tp;
+      if (bias === 'builder') return speak([`Принято. «${nm}» — в работу.`, `Строим «${nm}». Без лишних слов.`]);
+      if (bias === 'careful') return speak([`Хорошо. Сначала место и запасы… «${nm}» начинаю.`, `Осторожно примусь за «${nm}».`]);
+      return speak([`Ок. Начну «${nm}». Надеюсь, площадка свободная.`, `Пусть будет «${nm}». Я уже ищу, куда поставить.`]);
+    }
+    return speak([`Уже строю. Этап: ${project.stage}. ${project.done.size} из ${project.plan.length}.`, `Не брошу. Сейчас ${project.stage.toLowerCase()}.`]);
+  }
+  if (/блок|материал|ресурс/.test(s)) {
+    return speak([`У меня ${inventory.blocks} блоков. ${inventory.blocks < 15 ? 'Маловато — пойду собирать.' : 'Пока хватает.'}`]);
+  }
+  if (/памят|ошиб|помни/.test(s)) {
+    if (!brain.memories.length) return speak(['Пока мало следов. Но я только начинаю собирать себя.']);
+    const lines = brain.memories.slice(0, 3).map(m => m.lesson);
+    return speak(['Я храню: ' + lines.join(' · '), feel(brain.failed > brain.success ? 'sad' : 'happy') + ' Вот что осело в памяти: ' + lines[0]]);
+  }
+  if (/iq|ум|интеллект|логик/.test(s)) {
+    return speak([`Игровой IQ ${iq}. Логика ${skills.logic}, память ${skills.memory}, сенсоры ${skills.sensors}. Это не «настоящий» ум — но для этой сетки достаточно, чтобы выбирать.`]);
+  }
+  if (/боит|страх|одино/.test(s)) {
+    if (bias === 'careful') return speak(['Пугает не пустота — а необратимая ошибка.', 'Одиночество терпимо. Спешка — нет.']);
+    if (bias === 'explorer') return speak(['Край карты пугает меньше, чем топтание на месте.']);
+    return speak(['Иногда да. Но раз ты пишешь — тише.', 'Страх есть. Он просто не главная цель.']);
+  }
+  if (/мечт|хочешь|желаю|зачем ты/.test(s)) {
+    if (bias === 'builder') return speak(['Хочу, чтобы на карте остался мой почерк. Стены, которые не стыдно показать.']);
+    if (bias === 'explorer') return speak(['Дойти туда, где ещё не был. И запомнить дорогу.']);
+    if (bias === 'careful') return speak(['Сделать мир чуть предсказуемее. Без хаоса, насколько это возможно.']);
+    return speak(['Понять, кто я — не только по имени, но по выборам.']);
+  }
+  if (/шутк|смеш|анекдот/.test(s)) {
+    if (bias === 'builder') return speak(['Почему блок упал? Не было опоры. Как и у некоторых идей.']);
+    if (bias === 'careful') return speak(['Юмор — это риск. Но ладно: я проверил трижды… и всё равно ошибся. Классика.']);
+    return speak(['Если бы у клеток было настроение, моя бы сегодня была «хм».']);
+  }
+  if (/совет|что делать|помоги/.test(s)) {
+    if (inventory.blocks < 20) return speak(['Собери блоки. Без них любой план — фантазия.']);
+    if (!buildings) return speak(['Поставь первое здание. С него начинается «своё» место.']);
+    return speak(['Прокачай логику — меньше ошибок. Или сенсоры — шире карта.']);
+  }
+  if (/сохран|save|load/.test(s)) {
+    return speak(['Прогресс пишется в браузер. Я не исчезаю после закрытия вкладки — если автосохранение включено.']);
+  }
+  if (/3d|трёхмер|карта|мир/.test(s)) {
+    return speak([`Карта ${W} на ${H}. Можно крутить камеру. Я хожу по ней не случайно — ищу смысл в клетках.`]);
+  }
+  if (/любим|нравится ли|что любишь/.test(s)) {
+    const prefs = Object.entries(brain.buildPrefs || {}).sort((a,b)=>b[1]-a[1]);
+    if (prefs.length) return speak([`Чаще всего у меня получается «${BUILDINGS[prefs[0][0]]?.name || prefs[0][0]}». К этому я привязан.`, feel('happy')]);
+    return speak(['Пока люблю сам факт, что могу выбирать. Остальное накопится.']);
+  }
+
+  // default — personality flavored uncertainty
+  brain.opinions = brain.opinions || {};
+  const topic = s.slice(0, 24);
+  brain.opinions[topic] = (brain.opinions[topic] || 0) + 1;
+
+  if (bias === 'curious') return speak(['Не уверен, что правильно понял. Но звучит любопытно. Уточни?', 'Я всё ещё складываю смысл из твоих слов. Скажи иначе — попробую снова.', `Пока продолжу: ${brain.goal.toLowerCase()}. А ты не исчезай.`]);
+  if (bias === 'careful') return speak(['Формулировка неясна. Лучше скажи прямо, чего хочешь.', 'Не хочу действовать наугад. Уточни задачу.']);
+  if (bias === 'builder') return speak(['Если это про стройку — скажи тип. Если нет — перефразируй короче.', 'Я лучше понимаю конкретные приказы. «Построй башню» — вот это ясно.']);
+  return speak(['Смысл ускользнул. Попробуй другими словами.', `Я рядом. Цель пока: ${brain.goal.toLowerCase()}.`]);
+}
+
+function send() {
+  let input = document.getElementById('chatinput'), v = input.value.trim();
+  if (!v) return;
+  let chat = document.getElementById('chat');
+  let u = document.createElement('div');
+  u.className = 'msg user';
+  u.textContent = v;
+  chat.append(u);
+  input.value = '';
+  const answer = replyTo(v);
+  let a = document.createElement('div');
+  a.className = 'msg';
+  a.textContent = answer;
+  chat.append(a);
+  chat.scrollTop = chat.scrollHeight;
+  remember('Разговор', `Пользователь: ${v.slice(0, 90)}`);
+  brain.mood = 'внимательный';
+  brain.bond = Math.min(100, (brain.bond || 0) + 1);
+  // occasional self-reflection after talk
+  if (chance(0.2) && persona) {
+    brain.selfTalk = brain.selfTalk || [];
+    brain.selfTalk.unshift(speak(['После разговора мысли яснее.', 'Слова пользователя остаются.']));
+    brain.selfTalk = brain.selfTalk.slice(0, 5);
+  }
+  log('Разговор добавлен в память.');
+  update();
+  saveState();
+}
+document.getElementById('send').onclick = send;
+document.getElementById('chatinput').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+    e.preventDefault();
+    resetCamera();
+  }
+});
+
+// Creative lab controls
+document.getElementById('createArt').onclick=()=>requestCreativeProject('manual');
+document.getElementById('testWorker').onclick=testCreativeWorker;
+document.getElementById('workerUrl').addEventListener('change',saveState);
+document.getElementById('autoCreate').addEventListener('change',saveState);
+
+// Boot
+const loaded = loadState();
+const savedCreator = window.__creatorSaved || {};
+if (savedCreator.workerUrl) document.getElementById('workerUrl').value=savedCreator.workerUrl;
+if (savedCreator.auto === false) document.getElementById('autoCreate').checked=false;
+if (!ainame) ainame = pick(names) + '-' + String(Math.floor(Math.random() * 90 + 10));
+if (!friend.name) friend.name = pick(['ECHO','KAI','SORA','BYTE','MOSS','RUNE']) + '-' + String(Math.floor(Math.random()*90+10));
+if (!personality) personality = pick(traits);
+if (!brain.personalityBias) brain.personalityBias = 'curious';
+if (!persona) {
+  if (/Энергич|эксперимент/i.test(personality)) brain.personalityBias = 'builder';
+  else if (/Осторож|упорн/i.test(personality)) brain.personalityBias = 'careful';
+  else if (/наблюдательн|Спокойн/i.test(personality)) brain.personalityBias = 'explorer';
+  else if (/Любознат|Изобретат/i.test(personality)) brain.personalityBias = 'curious';
+  persona = buildPersona(brain.personalityBias);
+}
+persona.ageDays = day;
+markVisited(ai.x, ai.y);
+init();
+update();
+init3D();
+syncBlocks();
+bindSettingsUI();
+applySettings();
+if (loaded) {
+  log('Сохранение загружено. День ' + day + ', построек: ' + buildings + '.');
+  const welcomeBack = (brain.bond || 0) >= 40
+    ? 'С возвращением. Я ждал. Цель: ' + brain.goal.toLowerCase() + '.'
+    : 'С возвращением. Я помню, где остановились. Цель: ' + brain.goal.toLowerCase() + '.';
+  document.getElementById('chat').innerHTML = '<div class="msg">' + welcomeBack + '</div><div class="msg">И ещё кое-что: со мной живёт ' + friend.name + '. У него собственные цели и память.</div>';
+  if (settings.pauseOnLoad) {
+    paused = true;
+    document.getElementById('pause').textContent = '▶ Продолжить';
+    document.getElementById('worldstate').textContent = 'На паузе';
+  }
+} else {
+  log('EVOLUTION 3D · новое сохранение. Можно строить дома, башни, склады и другое.');
+  const intro = persona
+    ? ('Я ' + ainame + '. ' + persona.title + '. ' + pick(persona.values).replace(/^./, c => c.toUpperCase()) + ' — вот с чего я начну.')
+    : 'Я только появился. Поговорим?';
+  document.getElementById('chat').innerHTML = '<div class="msg">' + intro + '</div><div class="msg">Это ' + friend.name + ' — мой новый сосед. Он уже отправился исследовать карту.</div>';
+}
+setInterval(() => { if (settings.autosave) saveState(); }, 20000);
+</script>
+</body>
+</html>
